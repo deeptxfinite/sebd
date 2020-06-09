@@ -1,0 +1,243 @@
+curl -XPOST -H'Content-Type:application/json' 'localhost:9200/customers/_search?pretty' -d'
+{
+	"query": {
+		"bool": {
+		"should": [
+			{
+				"term": {
+				"state": {
+					"value": "idaho",
+					"boost": 2
+					}
+				}
+			},
+			{
+				"term": {
+				"state": {
+					"value": "california"
+					}
+				}
+			}
+			]
+		}
+	}
+}
+'
+
+
+curl -XPOST -H'Content-Type:application/json' 'localhost:9200/customers/_search?pretty' -d'
+{
+	"query": {
+		"bool":{
+			"must": {
+				"match": {
+					"state": "alabama"
+				}
+			},
+			"filter": {
+				"range": {
+					"age": {
+						"gte": 50
+					}
+				}
+			}
+		}
+	}
+}
+'
+
+curl -XPOST -H'Content-Type:application/json' 'localhost:9200/customers/_search?pretty' -d'
+{
+	"size": 0,
+	"aggs": {
+		"age_stats":{
+			"stats":{
+				"field": "age"
+			}
+		}
+	}
+}
+'
+
+
+curl -XPOST -H'Content-Type:application/json' 'localhost:9200/customers/_search?pretty' -d'
+{
+	"size": 0,
+	"query": {
+		"bool": {
+			"filter": {
+				"match":{
+					"state": "minnesota"
+				}
+			}
+		}
+	},
+	"aggs":{
+		"avg_age": {
+			"avg":{
+				"field": "age"
+			}
+		}
+	}
+}
+'
+
+
+curl -XPOST -H'Content-Type:application/json' 'localhost:9200/customers/_search?pretty' -d'
+{
+	"size": 0,
+	"aggs": {
+		"age_count": {
+			"cardinality": {
+				"field": "age"
+			}
+		}
+	}
+}
+'
+
+
+
+curl -XPUT "localhost:9200/customers/_mapping/personal?pretty" -H 'Content-Type: application/json' -d'
+{
+  "personal": {
+    "properties": {
+      "gender": {
+        "type": "text",
+        "fielddata": true
+      }
+    }
+  }
+}
+'
+
+curl -XPOST -H'Content-Type:application/json' 'localhost:9200/library/_mapping/article?pretty' -d'
+{
+	"article": {
+		"properties": {
+			"keywords": {
+				"type": "text",
+				"fielddata": true
+			}
+		}
+	}
+}
+'
+
+curl -XPOST -H'Content-Type:application/json' 'localhost:9200/customers/_search?pretty' -d'
+{
+	"size": 0,
+	"aggs": {
+		"gender_bucket": {
+			"terms": {
+				"field": "gender"
+			}
+		}
+	}
+}
+'
+
+
+curl -XPOST -H'Content-Type:application/json' 'localhost:9200/customers/_search?pretty' -d'
+{
+  "size": 0,
+  "aggs": {
+    "age_ranges": {
+      "range": {
+        "field": "age",
+        "ranges": [
+          {
+            "to": 30
+          },
+          {
+            "from": 30,
+            "to": 40
+          },
+          {
+            "from": 40,
+            "to": 55
+          },
+          {
+            "from": 55
+          }
+        ]
+      }
+    }
+  }
+}
+'
+
+curl -XPOST -H'Content-Type:application/json' 'localhost:9200/customers/_search?pretty' -d'
+{
+  "size": 0,
+  "aggs": {
+    "age_ranges": {
+      "range": {
+        "field": "age",
+        "ranges": [
+          {
+            "to": 30
+          },
+          {
+            "from": 30,
+            "to": 40
+          },
+          {
+            "from": 40,
+            "to": 55
+          },
+          {
+            "from": 55
+          }
+        ]
+      }
+    }
+  }
+}
+
+curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' -d'
+{
+    "explain": true,
+    "query" : {
+        "term" : { "user" : "kimchy" }
+    }
+}
+'
+curl -XPOST -H'Content-Type:application/json' 'localhost:9200/library/_mapping/article?pretty' -d'
+{
+	"article": {
+		"properties":{
+		"title": {
+			"type": "text",
+			"analyzer": "standard"
+			}
+		}
+	}
+}
+'
+
+curl -XPUT -H'Content-Type:application/json' 'localhost:9200/library?pretty' -d'
+{
+  "settings": {
+    "analysis": {
+      "filter": {
+        "autocomplete_filter": {
+          "type": "edge_ngram",
+          "min_ngram": 1,
+          "max_ngram": 20
+        }
+      },
+      "analyzer": {
+        "autocomplete": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "autocomplete_filter"
+          ]
+        }
+      }
+    }
+  }
+}
+'

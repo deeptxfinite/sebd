@@ -1,0 +1,17 @@
+{
+ "name": "sebd",
+ "version": "1.0.0",
+ "description": "This is a search engine by Deept.",
+ "main": "index.js",
+ "scripts": {
+  "lint": "eslint ."
+ },
+ "devDependencies": {
+  "eslint": "^4.19.0"
+ },
+ "author": "Deept Tripathi",
+ "license": "MIT",
+ "dependencies": {
+  "elasticsearch": "^16.7.1"
+ }
+}
